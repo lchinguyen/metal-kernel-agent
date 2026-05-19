@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.pyc
+
+# Swift / Metal build cache
+.swift-cache/
+.build/
+benchmarks/.build/
+
+# macOS
+.DS_Store
