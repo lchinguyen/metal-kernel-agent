@@ -1,11 +1,10 @@
 # Metal Kernel Agent: 
 An agentic context-engineering framework that uses Codex-guided optimization loops to iteratively design, benchmark, analyze, and improve custom Apple Metal kernels for transformer inference workloads.
 
-Metal Kernel Agent is a project for Codex-driven agentic optimization of Apple Metal kernels for local AI inference. The goal is to use an explicit multi-agent workflow to design, benchmark, critique, and improve custom Metal Shading Language kernels for transformer-style operators on Apple Silicon, with Torch used only as the baseline and correctness reference while the optimized paths remain real custom GPU kernels.
-
 ## Mission
 
-Codex-driven agentic optimization of Apple Metal kernels for local AI inference.
+Metal Kernel Agent is a project for Codex-driven agentic optimization of Apple Metal kernels for local AI inference. The goal is to use an explicit multi-agent workflow to design, benchmark, critique, and improve custom Metal Shading Language kernels for transformer-style operators on Apple Silicon, with Torch used only as the baseline and correctness reference while the optimized paths remain real custom GPU kernels.
+
 
 ## Architecture
 
