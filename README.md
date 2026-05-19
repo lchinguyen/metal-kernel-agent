@@ -35,6 +35,8 @@ Research   Benchmark   Performance
 - RMSNorm batch scaling
 - Custom Metal Softmax kernel
 - Multi-agent orchestration framework
+- fused RMSNorm + residual add kernel
+- benchmark reports and optimization plans
 
 ## Strongest Benchmark Results
 
