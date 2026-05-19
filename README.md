@@ -59,22 +59,11 @@ python benchmarks/softmax_metal.py
 python agents/orchestrator.py
 ```
 
-## Skills Developed
-
-- Designed and optimized custom Apple Metal kernels for transformer inference operators including RMSNorm and Softmax.
-- Built benchmark-driven GPU optimization workflows comparing custom Metal kernels against Torch baselines with correctness validation and latency profiling.
-- Implemented multi-variant kernel optimization strategies using threadgroup reductions, SIMD reductions, and workload scaling analysis.
-- Developed agentic optimization framework with Research, Benchmark, Kernel Engineer, and Performance Critic agents orchestrated through Codex-style context engineering.
-- Created reproducible benchmarking infrastructure using Python, Swift Metal helpers, JSONL experiment logging, and automated optimization reporting.
-- Analyzed GPU bottlenecks including command-buffer overhead, synchronization costs, dispatch efficiency, and scaling behavior across batch sizes.
-- Integrated Python benchmarking infrastructure with Swift Metal helpers, JSONL experiment logging, and modular orchestration pipelines for reproducible GPU optimization experiments.
-- Applied hardware-aware performance engineering techniques including memory-access optimization, reduction-strategy benchmarking, and latency-versus-throughput tradeoff analysis on Apple Silicon GPUs.
-
 ## Context Engineering
 
-[AGENTS.md](/Users/chinguyen/metal-kernel-agent/AGENTS.md) defines the optimization goals, tooling constraints, benchmark rules, and success criteria for the agentic optimization workflow, while the `.codex/skills` modules provide specialized guidance for Metal kernel engineering, transformer operator optimization, GPU benchmarking, and performance analysis. Together, these context-engineering layers guide how Codex generates and evaluates optimization strategies, ensuring all milestones use real custom Metal kernels, reproducible benchmarking, correctness validation against Torch baselines, and explicit reasoning about GPU performance tradeoffs.
+My role focused on designing the context-engineering and multi-agent optimization framework that guided how Codex performed Metal kernel optimization, benchmarking, and performance analysis. I defined the optimization objectives, benchmarking constraints, and success criteria through AGENTS.md and structured specialized `.codex/skills` modules for Metal kernel engineering, transformer operator optimization, and GPU benchmarking workflows. I also designed the interaction architecture between the Research Agent, Benchmark Methodologist, Kernel Engineer, and Performance Critic to enable structured optimization planning, benchmark-driven iteration, correctness validation against Torch baselines, and hardware-aware performance reasoning aligned with the contest requirements.
 
-My role is designed the context-engineering framework that guided how Codex performed kernel optimization research, benchmarking, and iterative performance analysis. I defined the optimization mission, system constraints, benchmark methodology, and success criteria through AGENTS.md, while structuring specialized `.codex/skills` modules to encode domain-specific guidance for Metal kernel engineering, transformer operator optimization, and GPU benchmarking workflows. I also designed the multi-agent optimization architecture, defining the responsibilities and interaction patterns between the Research Agent, Benchmark Methodologist, Kernel Engineer, and Performance Critic so the system could generate structured optimization plans instead of isolated code outputs. My role focused on shaping the reasoning environment and optimization process itself, ensuring that every generated solution remained aligned with the contest requirements: real custom Metal kernels, benchmark-driven evaluation, correctness validation against Torch baselines, and explicit reasoning about hardware-level performance tradeoffs.
+[AGENTS.md](/Users/chinguyen/metal-kernel-agent/AGENTS.md) defines the optimization goals, tooling constraints, benchmark rules, and success criteria for the agentic optimization workflow, while the `.codex/skills` modules provide specialized guidance for Metal kernel engineering, transformer operator optimization, GPU benchmarking, and performance analysis. Together, these context-engineering layers guide how Codex generates and evaluates optimization strategies, ensuring all milestones use real custom Metal kernels, reproducible benchmarking, correctness validation against Torch baselines, and explicit reasoning about GPU performance tradeoffs.
 
 
 ## Direct Metal Kernel Optimization 
@@ -99,10 +88,14 @@ The optimized implementations in this project are not wrappers around Torch, MLX
 - `results/optimization_plan.json`: Latest orchestrated optimization plan
 - `results/milestone6_agents_report.md`: Agent-framework architecture summary
 
-## Next Optimization Targets
 
-- Fused RMSNorm
-- Fused Softmax
-- MatMul
-- RoPE
-- KV cache operations
+## Skills Developed
+
+- Designed and optimized custom Apple Metal kernels for transformer inference operators including RMSNorm and Softmax.
+- Built benchmark-driven GPU optimization workflows comparing custom Metal kernels against Torch baselines with correctness validation and latency profiling.
+- Implemented multi-variant kernel optimization strategies using threadgroup reductions, SIMD reductions, and workload scaling analysis.
+- Developed agentic optimization framework with Research, Benchmark, Kernel Engineer, and Performance Critic agents orchestrated through Codex-style context engineering.
+- Created reproducible benchmarking infrastructure using Python, Swift Metal helpers, JSONL experiment logging, and automated optimization reporting.
+- Analyzed GPU bottlenecks including command-buffer overhead, synchronization costs, dispatch efficiency, and scaling behavior across batch sizes.
+- Integrated Python benchmarking infrastructure with Swift Metal helpers, JSONL experiment logging, and modular orchestration pipelines for reproducible GPU optimization experiments.
+- Applied hardware-aware performance engineering techniques including memory-access optimization, reduction-strategy benchmarking, and latency-versus-throughput tradeoff analysis on Apple Silicon GPUs.
