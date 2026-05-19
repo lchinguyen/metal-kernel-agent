@@ -1,0 +1,197 @@
+{
+  "framework_version": "milestone6",
+  "data_source": "results/results.jsonl",
+  "weakest_operator": "softmax",
+  "operator_summary": {
+    "operator": "softmax",
+    "record_count": 14,
+    "speedups": [
+      1.8413343506900657,
+      1.482473529287002,
+      0.7868583890136699,
+      0.9942006388415311,
+      0.9135878439791693,
+      1.1833736146540108,
+      1.1551555270765956
+    ],
+    "wall_times": [
+      0.17999586,
+      0.17939921,
+      0.21935332,
+      0.20037207,
+      0.24032996,
+      0.2328209,
+      0.24774625
+    ],
+    "gpu_times": [
+      0.012104166089557111,
+      0.012063748436048627,
+      0.026279165758751333,
+      0.016637498629279435,
+      0.03870708344038576,
+      0.03850249981041998,
+      0.05065333563834429
+    ],
+    "best_speedup": 1.8413343506900657,
+    "worst_speedup": 0.7868583890136699,
+    "average_speedup": 1.1938548419345778,
+    "dominant_bottleneck": "reduction plus launch overhead",
+    "representative_variants": [
+      "shared_256",
+      "simd_256"
+    ]
+  },
+  "critic": {
+    "agent_name": "performance_critic",
+    "system_role": "Interpret benchmark results, identify the weakest-performing operator, and explain the most likely bottlenecks behind its current behavior.",
+    "reasoning_summary": "softmax is currently the weakest operator because its mean speedup profile is only 1.19x and some measured configurations still lose to Torch.",
+    "structured_output": {
+      "operator": "softmax",
+      "average_speedup_vs_torch": 1.1938548419345778,
+      "average_wall_ms": 0.21428822428571428,
+      "average_gpu_ms": 0.02784964254325522,
+      "estimated_overhead_ratio": 0.8700365237703271,
+      "dominant_bottleneck": "reduction plus launch overhead",
+      "findings": [
+        "Softmax has two reductions per row, so reduction cost is inherently higher than RMSNorm.",
+        "Several batch sizes still underperform Torch, which makes Softmax the weakest operator in the current benchmark set.",
+        "GPU time is still much smaller than wall time, so dispatch overhead remains material even after batching rows."
+      ]
+    }
+  },
+  "research": {
+    "agent_name": "research_agent",
+    "system_role": "Identify operator-specific Metal optimization strategies and explain their memory, reduction, and numerical tradeoffs.",
+    "reasoning_summary": "softmax is limited more by reduction plus launch overhead than raw memory bandwidth, so the next useful ideas should either reduce reduction overhead or pack more useful work into each dispatch.",
+    "structured_output": {
+      "operator": "softmax",
+      "bottleneck": "reduction plus launch overhead",
+      "recommendations": [
+        {
+          "idea": "Fuse exponentiation reuse",
+          "why": "The current kernels compute exp twice per element. Caching row-local exponentials or staging them through threadgroup memory can reduce math overhead."
+        },
+        {
+          "idea": "Use SIMD reductions for row max and row sum",
+          "why": "Softmax has two row reductions. SIMD-first reductions reduce barrier pressure for small and medium batches."
+        },
+        {
+          "idea": "Process multiple rows per command buffer efficiently",
+          "why": "The benchmark data shows wall time remains much larger than GPU time, so launch overhead still matters."
+        }
+      ]
+    }
+  },
+  "benchmark_methodologist": {
+    "agent_name": "benchmark_methodologist",
+    "system_role": "Audit benchmark coverage, summarize measurement quality, and propose the next benchmark design needed to validate optimization work.",
+    "reasoning_summary": "The benchmark set is broad enough to compare operators across realistic batch sizes, but Softmax would benefit from clearer overhead attribution and a stable best-variant summary.",
+    "structured_output": {
+      "covered_batch_sizes": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64
+      ],
+      "average_speedup_vs_torch": 1.0931465297701783,
+      "next_checks": [
+        "Keep warmup and 100 timed iterations for continuity with earlier milestones.",
+        "Record best-variant-per-batch summaries separately from all-variant raw data.",
+        "Add a direct CPU-overhead estimate for Softmax just like RMSNorm if launch overhead remains ambiguous."
+      ]
+    }
+  },
+  "kernel_engineer": {
+    "agent_name": "kernel_engineer",
+    "system_role": "Translate bottleneck analysis into concrete kernel or dispatch changes that can be benchmarked next.",
+    "reasoning_summary": "The next optimization work for softmax should target the specific cost centers surfaced by the critic instead of broad rewrites.",
+    "structured_output": {
+      "operator": "softmax",
+      "proposals": [
+        {
+          "priority": 1,
+          "title": "Cache exponentials to avoid recomputation",
+          "target_files": [
+            "kernels/softmax.metal"
+          ],
+          "rationale": "Current Softmax computes exp during the sum pass and again during normalization.",
+          "expected_impact": "Lower GPU math cost and better throughput for medium and large batches."
+        },
+        {
+          "priority": 2,
+          "title": "Benchmark multi-row dispatch packing",
+          "target_files": [
+            "benchmarks/softmax_metal_helper.swift",
+            "benchmarks/softmax_metal.py"
+          ],
+          "rationale": "Wall time is still much larger than GPU time, so launch overhead likely needs further amortization.",
+          "expected_impact": "Better wall-clock performance on small batches."
+        },
+        {
+          "priority": 3,
+          "title": "Tune shared vs SIMD reduction by batch regime",
+          "target_files": [
+            "kernels/softmax.metal"
+          ],
+          "rationale": "The best variant flips by batch size, which suggests the dispatch policy should become input-aware.",
+          "expected_impact": "More consistent wins across the full scaling range."
+        }
+      ],
+      "research_alignment": [
+        {
+          "idea": "Fuse exponentiation reuse",
+          "why": "The current kernels compute exp twice per element. Caching row-local exponentials or staging them through threadgroup memory can reduce math overhead."
+        },
+        {
+          "idea": "Use SIMD reductions for row max and row sum",
+          "why": "Softmax has two row reductions. SIMD-first reductions reduce barrier pressure for small and medium batches."
+        },
+        {
+          "idea": "Process multiple rows per command buffer efficiently",
+          "why": "The benchmark data shows wall time remains much larger than GPU time, so launch overhead still matters."
+        }
+      ]
+    }
+  },
+  "optimization_plan": {
+    "focus_operator": "softmax",
+    "next_actions": [
+      {
+        "priority": 1,
+        "title": "Cache exponentials to avoid recomputation",
+        "target_files": [
+          "kernels/softmax.metal"
+        ],
+        "rationale": "Current Softmax computes exp during the sum pass and again during normalization.",
+        "expected_impact": "Lower GPU math cost and better throughput for medium and large batches."
+      },
+      {
+        "priority": 2,
+        "title": "Benchmark multi-row dispatch packing",
+        "target_files": [
+          "benchmarks/softmax_metal_helper.swift",
+          "benchmarks/softmax_metal.py"
+        ],
+        "rationale": "Wall time is still much larger than GPU time, so launch overhead likely needs further amortization.",
+        "expected_impact": "Better wall-clock performance on small batches."
+      },
+      {
+        "priority": 3,
+        "title": "Tune shared vs SIMD reduction by batch regime",
+        "target_files": [
+          "kernels/softmax.metal"
+        ],
+        "rationale": "The best variant flips by batch size, which suggests the dispatch policy should become input-aware.",
+        "expected_impact": "More consistent wins across the full scaling range."
+      }
+    ],
+    "validation_requirements": [
+      "Keep warmup and 100 timed iterations for continuity with earlier milestones.",
+      "Record best-variant-per-batch summaries separately from all-variant raw data.",
+      "Add a direct CPU-overhead estimate for Softmax just like RMSNorm if launch overhead remains ambiguous."
+    ]
+  }
+}

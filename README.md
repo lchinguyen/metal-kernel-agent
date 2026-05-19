@@ -1,0 +1,94 @@
+# Metal Kernel Agent
+
+Metal Kernel Agent is a project for Codex-driven agentic optimization of Apple Metal kernels for local AI inference. The goal is to use an explicit multi-agent workflow to design, benchmark, critique, and improve custom Metal Shading Language kernels for transformer-style operators on Apple Silicon, with Torch used only as the baseline and correctness reference while the optimized paths remain real custom GPU kernels.
+
+## Mission
+
+Codex-driven agentic optimization of Apple Metal kernels for local AI inference.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A["Research Agent"] --> B["Benchmark Methodologist"]
+    B --> C["Kernel Engineer"]
+    C --> D["Performance Critic"]
+    D --> E["Orchestrator"]
+```
+
+## Milestones Completed
+
+- Torch RMSNorm baseline
+- Custom Metal RMSNorm kernel
+- RMSNorm optimization variants
+- RMSNorm batch scaling
+- Custom Metal Softmax kernel
+- Multi-agent orchestration framework
+
+## Best Known Results
+
+| Milestone | Result |
+| --- | ---: |
+| RMSNorm best variant | 1.59x vs Torch |
+| RMSNorm scaling at batch 64 | 1.56x vs Torch |
+| Softmax at batch 1 | 1.84x vs Torch |
+| Softmax at batch 2 | 1.48x vs Torch |
+
+## Setup
+
+1. Use macOS on Apple Silicon with Metal support.
+2. Ensure Xcode command line tools and the Metal toolchain are available.
+3. Create or activate a Python environment with PyTorch installed.
+4. Run benchmarks from the repository root so result logs and generated reports land in `results/`.
+
+Example environment setup:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install torch
+```
+
+## Run Commands
+
+```bash
+python benchmarks/rmsnorm_torch_baseline.py
+python benchmarks/rmsnorm_metal.py
+python benchmarks/rmsnorm_scaling.py
+python benchmarks/softmax_metal.py
+python agents/orchestrator.py
+```
+
+## Context Engineering
+
+This repo is intentionally shaped around context engineering instead of ad hoc scripting. [AGENTS.md](/Users/chinguyen/metal-kernel-agent/AGENTS.md) defines the mission, allowed tools, operator targets, and success criteria for the optimization loop. The `.codex/skills` directory provides specialized guidance for Metal kernel engineering, RMSNorm-specific optimization, and benchmark methodology. Together they constrain how work is proposed and executed, so every milestone stays aligned with the contest rules: custom Metal kernels for optimized paths, fair benchmarking, and explicit reasoning about performance tradeoffs.
+
+## Why this is not just standard library benchmarking
+
+The optimized implementations in this project are not wrappers around Torch, MLX, MPSGraph, Accelerate, NumPy, or another standard library kernel. Torch is used only as the baseline and correctness reference. The optimized paths compile and dispatch real custom Metal kernels from `.metal` source through explicit benchmark runners and Swift Metal helpers, which makes the results about kernel engineering rather than API selection.
+
+## Current Operator Coverage
+
+- RMSNorm:
+  Custom float32 Metal kernels, multiple reduction variants, scaling benchmarks, and correctness checks against Torch.
+- Softmax:
+  Numerically stable custom float32 Metal kernels with row-max subtraction, multiple reduction variants, and scaling benchmarks against Torch.
+- Agent Orchestration:
+  Deterministic research, benchmarking, engineering, and critique agents that consume real benchmark logs and emit a structured optimization plan.
+
+## Reports and Artifacts
+
+- `results/results.jsonl`: Append-only benchmark history
+- `results/milestone3_report.md`: RMSNorm optimization-variant analysis
+- `results/milestone4_scaling_report.md`: RMSNorm workload-scaling analysis
+- `results/milestone5_softmax_report.md`: Softmax kernel benchmark report
+- `results/optimization_plan.json`: Latest orchestrated optimization plan
+- `results/milestone6_agents_report.md`: Agent-framework architecture summary
+
+## Next Optimization Targets
+
+- Fused RMSNorm
+- Fused Softmax
+- MatMul
+- RoPE
+- KV cache operations
