@@ -108,7 +108,7 @@ The optimized implementations in this project are not wrappers around Torch, MLX
 
 
 
-## Skills Developed
+## My role
 
 - Designed and optimized custom Apple Metal kernels for transformer inference using RMSNorm, Softmax, kernel fusion, SIMD reductions, and threadgroup-level GPU optimization strategies.
 - Built benchmark-driven GPU optimization workflows with Torch baseline validation, latency profiling, workload scaling analysis, and hardware-aware performance tuning on Apple Silicon GPUs.
