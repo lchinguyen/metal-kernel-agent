@@ -69,7 +69,6 @@ python agents/orchestrator.py
 - Analyzed GPU bottlenecks including command-buffer overhead, synchronization costs, dispatch efficiency, and scaling behavior across batch sizes.
 - Integrated Python benchmarking infrastructure with Swift Metal helpers, JSONL experiment logging, and modular orchestration pipelines for reproducible GPU optimization experiments.
 - Applied hardware-aware performance engineering techniques including memory-access optimization, reduction-strategy benchmarking, and latency-versus-throughput tradeoff analysis on Apple Silicon GPUs.
-- Applied context engineering techniques using AGENTS.md and structured Codex skills to guide iterative kernel optimization workflows.
 
 ## Context Engineering
 
