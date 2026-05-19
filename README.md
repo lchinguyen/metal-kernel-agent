@@ -59,6 +59,18 @@ python benchmarks/softmax_metal.py
 python agents/orchestrator.py
 ```
 
+## Skills Developed
+
+- Designed and optimized custom Apple Metal kernels for transformer inference operators including RMSNorm and Softmax.
+- Built benchmark-driven GPU optimization workflows comparing custom Metal kernels against Torch baselines with correctness validation and latency profiling.
+- Implemented multi-variant kernel optimization strategies using threadgroup reductions, SIMD reductions, and workload scaling analysis.
+- Developed agentic optimization framework with Research, Benchmark, Kernel Engineer, and Performance Critic agents orchestrated through Codex-style context engineering.
+- Created reproducible benchmarking infrastructure using Python, Swift Metal helpers, JSONL experiment logging, and automated optimization reporting.
+- Analyzed GPU bottlenecks including command-buffer overhead, synchronization costs, dispatch efficiency, and scaling behavior across batch sizes.
+- Integrated Python benchmarking infrastructure with Swift Metal helpers, JSONL experiment logging, and modular orchestration pipelines for reproducible GPU optimization experiments.
+- Applied hardware-aware performance engineering techniques including memory-access optimization, reduction-strategy benchmarking, and latency-versus-throughput tradeoff analysis on Apple Silicon GPUs.
+- Applied context engineering techniques using AGENTS.md and structured Codex skills to guide iterative kernel optimization workflows.
+
 ## Context Engineering
 
 This repo is intentionally shaped around context engineering instead of ad hoc scripting. 
