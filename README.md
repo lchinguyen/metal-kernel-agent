@@ -73,6 +73,7 @@ python benchmarks/rmsnorm_torch_baseline.py
 python benchmarks/rmsnorm_metal.py
 python benchmarks/rmsnorm_scaling.py
 python benchmarks/softmax_metal.py
+python benchmarks/fused_rmsnorm_residual.py
 python agents/orchestrator.py
 ```
 
