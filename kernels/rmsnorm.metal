@@ -53,6 +53,73 @@ kernel void rmsnorm_256_shared_f32(
     }
 }
 
+kernel void residual_add_f32(
+    device const float* input [[buffer(0)]],
+    device const float* residual [[buffer(1)]],
+    device float* output [[buffer(2)]],
+    constant RMSNormParams& params [[buffer(3)]],
+    uint row_id [[threadgroup_position_in_grid]],
+    uint tid [[thread_position_in_threadgroup]],
+    uint threads_per_group [[threads_per_threadgroup]]
+) {
+    if (row_id >= params.row_count) {
+        return;
+    }
+
+    uint row_offset = row_id * params.element_count;
+    for (uint index = tid; index < params.element_count; index += threads_per_group) {
+        uint offset = row_offset + index;
+        output[offset] = input[offset] + residual[offset];
+    }
+}
+
+kernel void fused_rmsnorm_residual_256_shared_f32(
+    device const float* input [[buffer(0)]],
+    device const float* weight [[buffer(1)]],
+    device const float* residual [[buffer(2)]],
+    device float* output [[buffer(3)]],
+    constant RMSNormParams& params [[buffer(4)]],
+    uint row_id [[threadgroup_position_in_grid]],
+    uint tid [[thread_position_in_threadgroup]],
+    uint threads_per_group [[threads_per_threadgroup]]
+) {
+    threadgroup float partial_sums[256];
+    threadgroup float inv_rms;
+
+    if (row_id >= params.row_count) {
+        return;
+    }
+
+    uint row_offset = row_id * params.element_count;
+
+    float local_sum = 0.0f;
+    for (uint index = tid; index < params.element_count; index += threads_per_group) {
+        float value = input[row_offset + index];
+        local_sum += value * value;
+    }
+
+    partial_sums[tid] = local_sum;
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+
+    for (uint stride = threads_per_group / 2; stride > 0; stride /= 2) {
+        if (tid < stride) {
+            partial_sums[tid] += partial_sums[tid + stride];
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+    }
+
+    if (tid == 0) {
+        float mean_square = partial_sums[0] / static_cast<float>(params.element_count);
+        inv_rms = rsqrt(mean_square + params.eps);
+    }
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+
+    for (uint index = tid; index < params.element_count; index += threads_per_group) {
+        uint offset = row_offset + index;
+        output[offset] = residual[offset] + (input[offset] * inv_rms * weight[index]);
+    }
+}
+
 kernel void rmsnorm_128_shared_f32(
     device const float* input [[buffer(0)]],
     device const float* weight [[buffer(1)]],
