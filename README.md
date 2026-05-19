@@ -72,8 +72,6 @@ python agents/orchestrator.py
 
 ## Context Engineering
 
-This repo is intentionally shaped around context engineering instead of ad hoc scripting. 
-
 [AGENTS.md](/Users/chinguyen/metal-kernel-agent/AGENTS.md) defines the mission, allowed tools, operator targets, and success criteria for the optimization loop. The `.codex/skills` directory provides specialized guidance for Metal kernel engineering, RMSNorm-specific optimization, and benchmark methodology. Together they constrain how work is proposed and executed, so every milestone stays aligned with the contest rules: custom Metal kernels for optimized paths, fair benchmarking, and explicit reasoning about performance tradeoffs.
 
 ## Direct Metal Kernel Optimization 
