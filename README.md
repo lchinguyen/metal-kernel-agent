@@ -1,4 +1,4 @@
-# Metal Kernel Agent
+# Metal Kernel Agent: An agentic context-engineering framework that uses Codex-guided optimization loops to iteratively design, benchmark, analyze, and improve custom Apple Metal kernels for transformer inference workloads.
 
 Metal Kernel Agent is a project for Codex-driven agentic optimization of Apple Metal kernels for local AI inference. The goal is to use an explicit multi-agent workflow to design, benchmark, critique, and improve custom Metal Shading Language kernels for transformer-style operators on Apple Silicon, with Torch used only as the baseline and correctness reference while the optimized paths remain real custom GPU kernels.
 
@@ -9,11 +9,22 @@ Codex-driven agentic optimization of Apple Metal kernels for local AI inference.
 ## Architecture
 
 ```mermaid
-flowchart LR
-    A["Research Agent"] --> B["Benchmark Methodologist"]
-    B --> C["Kernel Engineer"]
-    C --> D["Performance Critic"]
-    D --> E["Orchestrator"]
+AGENTS.md + .codex/skills
+              ↓
+        Orchestrator
+              ↓
+ ┌────────────┼────────────┐
+ ↓            ↓            ↓
+Research   Benchmark   Performance
+ Agent    Methodologist  Critic
+              ↓
+       Kernel Engineer
+              ↓
+      Metal Kernel Variants
+              ↓
+        Benchmark Results
+              ↓
+      Optimization Plans
 ```
 
 ## Milestones Completed
@@ -25,14 +36,18 @@ flowchart LR
 - Custom Metal Softmax kernel
 - Multi-agent orchestration framework
 
-## Best Known Results
+## Strongest Benchmark Results
 
-| Milestone | Result |
-| --- | ---: |
-| RMSNorm best variant | 1.59x vs Torch |
-| RMSNorm scaling at batch 64 | 1.56x vs Torch |
-| Softmax at batch 1 | 1.84x vs Torch |
-| Softmax at batch 2 | 1.48x vs Torch |
+| Milestone | Best Result |
+|---|---|
+| RMSNorm best variant | **1.59x vs Torch** |
+| RMSNorm scaling at batch 64 | **1.56x vs Torch** |
+| Softmax at batch 1 | **1.84x vs Torch** |
+| Softmax at batch 2 | **1.48x vs Torch** |
+| Fused RMSNorm + Residual at batch 4 | **1.75x vs Torch** |
+| Fused RMSNorm + Residual vs unfused Metal | **1.35x faster** |
+
+All optimized kernels preserved correctness against Torch baselines with only minimal numerical error tolerance.
 
 ## Setup
 
